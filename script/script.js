@@ -398,8 +398,8 @@ function playerToken() {
   let svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   svg.setAttribute("xmlns", "http://www.w3.org/2000/svg");
   svg.setAttribute("xmlns:xlink", "http://www.w3.org/1999/xlink");
-  svg.setAttribute("width", 150);
-  svg.setAttribute("height", 150);
+  svg.setAttribute("width", 250);
+  svg.setAttribute("height", 250);
   svg.id = "playerToken";
   let defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
   let clipPath = document.createElementNS(
@@ -409,8 +409,8 @@ function playerToken() {
   clipPath.id = "clip";
   let mask = document.createElementNS("http://www.w3.org/2000/svg", "circle");
   mask.setAttribute("r", 50);
-  mask.setAttribute("cx", 75);
-  mask.setAttribute("cy", 75);
+  mask.setAttribute("cx", 125);
+  mask.setAttribute("cy", 125);
   clipPath.appendChild(mask);
   defs.appendChild(clipPath);
   svg.appendChild(defs);
@@ -420,10 +420,10 @@ function playerToken() {
     "circle"
   );
   playerToken.setAttribute("r", 50);
-  playerToken.setAttribute("cx", 75);
-  playerToken.setAttribute("cy", 75);
+  playerToken.setAttribute("cx", 125);
+  playerToken.setAttribute("cy", 125);
   playerToken.setAttribute("stroke", "green");
-  playerToken.setAttribute("stroke-width", 5);
+  playerToken.setAttribute("stroke-width", 3);
 
   let playerImage = document.createElementNS(
     "http://www.w3.org/2000/svg",
@@ -436,11 +436,53 @@ function playerToken() {
   );
   playerImage.setAttribute("width", 150);
   playerImage.setAttribute("height", 150);
+  playerImage.setAttribute("x", 50);
+  playerImage.setAttribute("y", 50);
   playerImage.id = "playerTimage";
   playerImage.setAttribute("clip-path", "url(#clip)");
+  for (let i = 1; i <= 4; i++) {
+    let polcoords = [
+      ,
+      "25,125 70,100 70,150",
+      "225,125 180,100 180,150",
+      "100,70 125,25 150,70",
+      "100,180 125,225 150,180",
+    ];
+    let polygon = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "polygon"
+    );
+    polygon.setAttribute("points", polcoords[i]);
+    polygon.setAttribute("fill", "green");
+    polygon.setAttribute("stroke", "white");
+    polygon.setAttribute("stroke-width", 2);
+    polygon.classList.add("polygon");
+    polygon.id = `AR${i}`;
+  }
 
   svg.appendChild(playerToken);
   svg.appendChild(playerImage);
+  for (let i = 1; i <= 4; i++) {
+    let polcoords = [
+      ,
+      "25,125 70,100 70,150",
+      "225,125 180,100 180,150",
+      "100,70 125,25 150,70",
+      "100,180 125,225 150,180",
+    ];
+    let polygon = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "polygon"
+    );
+    polygon.setAttribute("points", polcoords[i]);
+    polygon.setAttribute("fill", "green");
+    polygon.setAttribute("stroke", "white");
+    polygon.setAttribute("stroke-width", 2);
+    polygon.classList.add("polygon");
+    polygon.id = `AR${i}`;
+    svg.appendChild(polygon);
+  }
+
   let strLoc;
   let start;
   if (localStorage.getItem("playerLocation") == null) {
@@ -642,15 +684,35 @@ function dragdropend(EO) {
       colorChoose = "";
       cowsamountChoose = 0;
       dragState = 0;
+      arrowVisible();
     }
   }
 }
 
 // функции движения фишки
 
-document.addEventListener("keydown", moveToken);
+document.addEventListener("keydown", keysMovemet);
+document.addEventListener("mousedown", mouseMovemet);
 
-function moveToken(EO) {
+//движение мышкой по стрелкам
+function mouseMovemet(EO) {
+  if (playerMoves != 0) {
+    if (EO.target.id == "AR3" && priviousMove != "up") {
+      movement("up");
+    }
+    if (EO.target.id == "AR4" && priviousMove != "down") {
+      movement("down");
+    }
+    if (EO.target.id == "AR1" && priviousMove != "left") {
+      movement("left");
+    }
+    if (EO.target.id == "AR2" && priviousMove != "right") {
+      movement("right");
+    }
+  }
+}
+// движение клавишами
+function keysMovemet(EO) {
   if (playerMoves != 0) {
     if (EO.code == "ArrowUp" && priviousMove != "up") {
       movement("up");
@@ -666,7 +728,50 @@ function moveToken(EO) {
     }
   }
 }
+// визуал стрелок от допустимых ходов
+function arrowVisible() {
+  let left = document.getElementById("AR1");
+  let right = document.getElementById("AR2");
+  let up = document.getElementById("AR3");
+  let down = document.getElementById("AR4");
 
+  let arrows = document.getElementsByTagName("polygon");
+  playerMoves != 0 ? allvis("remove") : allvis("add");
+  function allvis(e) {
+    for (let i = 0; i < arrows.length; i++) {
+      e == "remove"
+        ? arrows[i].classList.remove("polygon")
+        : arrows[i].classList.add("polygon");
+    }
+  }
+
+  if (priviousMove == "left") {
+    left.classList.add("polygon");
+  }
+  if (priviousMove == "up") {
+    up.classList.add("polygon");
+  }
+  if (priviousMove == "right") {
+    right.classList.add("polygon");
+  }
+  if (priviousMove == "down") {
+    down.classList.add("polygon");
+  }
+  if (playerPosX == 0) {
+    left.classList.add("polygon");
+  }
+  if (playerPosX == 2) {
+    right.classList.add("polygon");
+  }
+  if (playerPosY == 0) {
+    up.classList.add("polygon");
+  }
+  if (playerPosY == 2) {
+    down.classList.add("polygon");
+  }
+}
+
+//движение фишки
 function movement(dir) {
   switch (dir) {
     case "up":
@@ -696,6 +801,9 @@ function movement(dir) {
 
   currPos.removeChild(token);
   destPos.appendChild(token);
+
+  arrowVisible();
+
   localStorage.playerLocation = landMap[playerPosY][playerPosX].name;
   playerObjLocation = landMap[playerPosY][playerPosX];
   if (playerMoves == 0) {
