@@ -147,6 +147,9 @@ span {
 svg {
   position: absolute;
   z-index: 2;
-  left: 175px;
-  top: 75px;
+  left: 125px;
+  top: 25px;
+}
+.polygon {
+  display: none;
 }
