@@ -170,7 +170,7 @@ function menumove(EO) {
     if (gameZone != undefined) {
       wraperMain.removeChild(gameZone);
       document.body.style.background =
-        "url(../assets/background.jpg) no-repeat center";
+        "url(assets/background.jpg) no-repeat center";
       gameZone = undefined;
     }
     setTimeout(mainMenuMove, 500);
@@ -342,7 +342,7 @@ function fieldHtmlCreate() {
       div.id = `${landMap[i][j].name}`;
       div.addEventListener("mousedown", dragdrop);
       let img = document.createElement("img");
-      img.src = `../assets/${landMap[i][j].name}.jpg`;
+      img.src = `assets/${landMap[i][j].name}.jpg`;
       img.classList.add("land");
       div.appendChild(cowDivCreate());
       div.appendChild(img);
@@ -357,7 +357,7 @@ function fieldHtmlCreate() {
     let player = document.createElement("div");
     player.id = `player_${i}`;
     let img = document.createElement("img");
-    img.src = `../assets/P${i}.jpg`;
+    img.src = `assets/P${i}.jpg`;
     img.classList.add("icon");
     player.appendChild(img);
     player.appendChild(cowDivCreate());
@@ -384,7 +384,7 @@ function cowDivCreate() {
     cow.setAttribute("data-cowtype", `${cowarr[i]}`);
     let img = document.createElement("img");
     img.classList.add("cow_img");
-    img.src = `../assets/cow_${cowarr[i]}.png`;
+    img.src = `assets/cow_${cowarr[i]}.png`;
     let span = document.createElement("span");
     cow.appendChild(img);
     cow.appendChild(span);
@@ -432,7 +432,7 @@ function playerToken() {
   playerImage.setAttributeNS(
     "http://www.w3.org/1999/xlink",
     "href",
-    `../assets/P${activePlayer}.jpg`
+    `assets/P${activePlayer}.jpg`
   );
   playerImage.setAttribute("width", 150);
   playerImage.setAttribute("height", 150);
@@ -457,8 +457,7 @@ function playerToken() {
 
 //инициализация игрового экрана
 function gameInit() {
-  document.body.style.background =
-    "url(../assets/game_bg.jpg) no-repeat center";
+  document.body.style.background = "url(assets/game_bg.jpg) no-repeat center";
   if (localStorage.getItem("gameState") == 0) {
     fieldCreator();
     landStartFill(landArr);
@@ -707,7 +706,7 @@ function movement(dir) {
     portr.setAttributeNS(
       "http://www.w3.org/1999/xlink",
       "href",
-      `../assets/P${activePlayer}.jpg`
+      `assets/P${activePlayer}.jpg`
     );
     if (playerObjLocation.cows.total == 0) {
       gameEnd();
