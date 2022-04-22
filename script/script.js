@@ -827,7 +827,7 @@ let playSong = document.getElementById("game_start");
 playSong.addEventListener("mousedown", playaudio);
 
 let song = new Audio();
-song.src = "../assets/song.mp3";
+song.src = "assets/song.mp3";
 song.volume = 0.5;
 song.loop = true;
 let arclick = new Audio();
