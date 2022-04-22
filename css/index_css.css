@@ -153,3 +153,12 @@ svg {
 .polygon {
   display: none;
 }
+
+@media all and (orientation: portrait) {
+  html,
+  body {
+    transform: rotate(-90deg);
+    transform-origin: left top;
+    width: 100vh;
+  }
+}
