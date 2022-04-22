@@ -850,6 +850,7 @@ var touchShiftY = 0;
 
 function touchStrat(EO) {
   EO.preventDefault();
+  console.log(EO.target);
   el = EO.target.parentNode;
 
   let touchInfo = EO.targetTouches[0];
@@ -857,7 +858,10 @@ function touchStrat(EO) {
   touchShiftY = touchInfo.pageY - el.offsetTop;
   if (dragallow == 0) {
     EO.preventDefault();
-  } else if (EO.target.className == "land") {
+  } else if (
+    EO.target.className == "land" ||
+    EO.target.className == "land_cows"
+  ) {
     EO.preventDefault();
   } else {
     if (
