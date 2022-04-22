@@ -362,7 +362,6 @@ function fieldHtmlCreate() {
     player.appendChild(img);
     player.appendChild(cowDivCreate());
     player.addEventListener("mouseover", dragdropend);
-    player.addEventListener("touchend", dragdropend);
     playerZone.appendChild(player);
   }
 
@@ -839,9 +838,4 @@ function score(P) {
 }
 
 // тач управление
-window.document.addEventListener("touchstart", dragdrop);
-
-function touchtest(EO) {
-  console.log(EO);
-  console.log(EO.target);
-}
+document.addEventListener("touchstart", dragdrop);
