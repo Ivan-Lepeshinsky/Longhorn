@@ -162,3 +162,30 @@ svg {
     width: 100vh;
   }
 }
+
+@media only screen and (max-width: 1600px) {
+  body {
+    width: 1200px;
+    height: 800px;
+  }
+  .wraper {
+    width: 1200px;
+  }
+  #game_name {
+    margin-top: 100px;
+    font-size: 5em;
+    color: chocolate;
+  }
+
+  .menu {
+    width: 100px;
+    margin-top: 100px;
+  }
+
+  .menu_button {
+    width: 100px;
+    height: 25px;
+    padding: 5px;
+    font-size: 14px;
+  }
+}
