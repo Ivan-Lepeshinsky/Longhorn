@@ -362,6 +362,7 @@ function fieldHtmlCreate() {
     player.appendChild(img);
     player.appendChild(cowDivCreate());
     player.addEventListener("mouseover", dragdropend);
+    player.addEventListener("touchend", dragdropend);
     playerZone.appendChild(player);
   }
 
@@ -739,9 +740,7 @@ function arrowVisible() {
   playerMoves != 0 ? allvis("remove") : allvis("add");
   function allvis(e) {
     for (let i = 0; i < arrows.length; i++) {
-      e == "remove"
-        ? arrows[i].classList.remove("polygon")
-        : arrows[i].classList.add("polygon");
+      arrows[i].classList[e]("polygon");
     }
   }
 
@@ -837,4 +836,12 @@ function score(P) {
     score += cowsRemain[cowsType[i]] * P.cows[cowsType[i]];
   }
   return score * 100 + "$";
+}
+
+// тач управление
+window.document.addEventListener("touchstart", dragdrop);
+
+function touchtest(EO) {
+  console.log(EO);
+  console.log(EO.target);
 }
