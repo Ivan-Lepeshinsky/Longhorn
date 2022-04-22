@@ -378,6 +378,7 @@ function cowDivCreate() {
   let cowarr = ["black", "brown", "grey", "white"];
   let cowDiv = document.createElement("div");
   cowDiv.classList.add("land_cows");
+  cowDiv.addEventListener("touchstart", touchStrat);
   for (let i = 0; i < cowarr.length; i++) {
     let cow = document.createElement("div");
     cow.classList.add("cow");
@@ -400,6 +401,7 @@ function playerToken() {
   svg.setAttribute("xmlns:xlink", "http://www.w3.org/1999/xlink");
   svg.setAttribute("width", 250);
   svg.setAttribute("height", 250);
+
   svg.id = "playerToken";
   let defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
   let clipPath = document.createElementNS(
@@ -819,9 +821,6 @@ function score(P) {
   return score * 100 + "$";
 }
 
-// тач управление
-document.addEventListener("touchstart", dragdrop);
-
 // аудио
 let playSong = document.getElementById("game_start");
 playSong.addEventListener("mousedown", playaudio);
@@ -840,4 +839,71 @@ function playaudio() {
 function clickSound() {
   arclick.play();
 }
-///test
+
+// тач управление
+
+document.addEventListener("touchmove", touchMove);
+document.addEventListener("touchend", touchEnd);
+let el;
+var touchShiftX = 0;
+var touchShiftY = 0;
+
+function touchStrat(EO) {
+  EO.preventDefault();
+  el = EO.target.parentNode;
+
+  let touchInfo = EO.targetTouches[0];
+  touchShiftX = touchInfo.pageX - el.offsetLeft;
+  touchShiftY = touchInfo.pageY - el.offsetTop;
+  if (dragallow == 0) {
+    EO.preventDefault();
+  } else if (EO.target.className == "land") {
+    EO.preventDefault();
+  } else {
+    if (
+      EO.currentTarget.parentNode.id == localStorage.getItem("playerLocation")
+    ) {
+      el.style.position = "absolute";
+      colorChoose = el.getAttribute("data-cowtype");
+      cowsamountChoose = +EO.target.nextSibling.innerHTML;
+      zoneland = document.getElementById(`player_${activePlayer}`);
+      zoneland.classList.add("land_cows_landing");
+      dragState = 1;
+      playerMoves = cowsamountChoose;
+    } else {
+      EO.preventDefault();
+    }
+  }
+}
+function touchMove(EO) {
+  if (dragallow == 0) {
+    EO.preventDefault();
+  } else if (EO.target.className == "land") {
+    EO.preventDefault();
+  }
+  // EO.preventDefault();
+  let touchInfo = EO.targetTouches[0];
+  el.style.left = touchInfo.pageX - touchShiftX + "px";
+  el.style.top = touchInfo.pageY - touchShiftY + "px";
+}
+
+function touchEnd(EO) {
+  if (dragState == 1) {
+    el.style.position = "relative";
+    // let pl = EO.currentTarget.id.split("_");
+    // if (activePlayer == pl[1]) {
+    zoneland.classList.remove("land_cows_landing");
+    playerObjLocation.remoweCow(colorChoose, cowsamountChoose);
+    cowsRemain[colorChoose] -= cowsamountChoose;
+    activePlayer == 1
+      ? P1.addCow(colorChoose, cowsamountChoose)
+      : P2.addCow(colorChoose, cowsamountChoose);
+    updateCows();
+    dragallow = 0;
+    colorChoose = "";
+    cowsamountChoose = 0;
+    dragState = 0;
+    arrowVisible();
+    // }
+  }
+}
