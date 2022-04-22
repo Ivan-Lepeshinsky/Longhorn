@@ -362,7 +362,6 @@ function fieldHtmlCreate() {
     player.appendChild(img);
     player.appendChild(cowDivCreate());
     player.addEventListener("mouseover", dragdropend);
-    player.addEventListener("touchend", dragdropend);
     playerZone.appendChild(player);
   }
 
@@ -441,25 +440,6 @@ function playerToken() {
   playerImage.setAttribute("y", 50);
   playerImage.id = "playerTimage";
   playerImage.setAttribute("clip-path", "url(#clip)");
-  for (let i = 1; i <= 4; i++) {
-    let polcoords = [
-      ,
-      "25,125 70,100 70,150",
-      "225,125 180,100 180,150",
-      "100,70 125,25 150,70",
-      "100,180 125,225 150,180",
-    ];
-    let polygon = document.createElementNS(
-      "http://www.w3.org/2000/svg",
-      "polygon"
-    );
-    polygon.setAttribute("points", polcoords[i]);
-    polygon.setAttribute("fill", "green");
-    polygon.setAttribute("stroke", "white");
-    polygon.setAttribute("stroke-width", 2);
-    polygon.classList.add("polygon");
-    polygon.id = `AR${i}`;
-  }
 
   svg.appendChild(playerToken);
   svg.appendChild(playerImage);
@@ -480,6 +460,7 @@ function playerToken() {
     polygon.setAttribute("stroke", "white");
     polygon.setAttribute("stroke-width", 2);
     polygon.classList.add("polygon");
+    polygon.addEventListener("mousedown", clickSound);
     polygon.id = `AR${i}`;
     svg.appendChild(polygon);
   }
@@ -839,9 +820,23 @@ function score(P) {
 }
 
 // тач управление
-window.document.addEventListener("touchstart", dragdrop);
+document.addEventListener("touchstart", dragdrop);
 
-function touchtest(EO) {
-  console.log(EO);
-  console.log(EO.target);
+// аудио
+let playSong = document.getElementById("game_start");
+playSong.addEventListener("mousedown", playaudio);
+
+let song = new Audio();
+song.src = "../assets/song.mp3";
+song.volume = 0.5;
+song.loop = true;
+let arclick = new Audio();
+arclick.src =
+  "http://www.kalmanovitz.co.il/courses/English/construction/Assets/Mousclik.wav";
+
+function playaudio() {
+  song.play();
+}
+function clickSound() {
+  arclick.play();
 }
