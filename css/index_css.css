@@ -80,10 +80,7 @@ p {
 }
 
 /* css игровой области */
-/* .wrapper {
-  width: 1900px;
-  margin: 0 auto;
-} */
+
 #gameZone {
   display: flex;
   flex-direction: row;
@@ -175,7 +172,6 @@ svg {
   #game_name {
     margin-top: 100px;
     font-size: 5em;
-    color: chocolate;
   }
 
   .menu {
@@ -220,5 +216,71 @@ svg {
   svg {
     left: 30px;
     top: -15px;
+    transform: scale(0.7);
+  }
+}
+
+@media only screen and (max-width: 1300px) {
+  body {
+    width: 1200px;
+    height: 600px;
+  }
+  .wraper {
+    width: 1000px;
+    margin: 0 auto;
+  }
+  #game_name {
+    margin-top: 50px;
+  }
+
+  .menu {
+    width: 100px;
+    margin-top: 100px;
+  }
+
+  .menu_button {
+    width: 100px;
+    height: 25px;
+    padding: 5px;
+    font-size: 14px;
+  }
+  #field {
+    width: 800px;
+    height: 600px;
+  }
+
+  .land {
+    margin: 5px 5px 0 0;
+    width: 250px;
+    height: 180px;
+  }
+  #player_zone {
+    width: 100px;
+  }
+  #player_1,
+  #player_2 {
+    height: 50%;
+  }
+
+  .land_cows_landing {
+    border: 1px solid red;
+    width: 100px;
+    height: 120px;
+  }
+
+  .cow_img {
+    width: 50px;
+    height: 25px;
+  }
+
+  span {
+    margin-top: 10px;
+    font-size: 20px;
+  }
+
+  svg {
+    left: 10px;
+    top: -20px;
+    transform: scale(0.5);
   }
 }
