@@ -818,7 +818,7 @@ song.volume = 0.5;
 song.loop = true;
 let arclick = new Audio();
 arclick.src =
-  "http://www.kalmanovitz.co.il/courses/English/construction/Assets/Mousclik.wav";
+  "https://www.kalmanovitz.co.il/courses/English/construction/Assets/Mousclik.wav";
 
 function playaudio() {
   song.play();
