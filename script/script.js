@@ -202,7 +202,7 @@ function scoresMove() {
     window.getComputedStyle(scoresBlock).getPropertyValue("top") == "2000px"
   ) {
     scoresBlock.style.top = "50px";
-    wraperMain.removeChild(mainMenu);
+    // wraperMain.removeChild(mainMenu);
   } else {
     scoresBlock.style.top = "2000px";
   }
@@ -659,7 +659,7 @@ function dragdropend(EO) {
     let pl = EO.currentTarget.id.split("_");
     if (activePlayer == pl[1]) {
       zoneland.classList.remove("land_cows_landing");
-      console.log(playerObjLocation.this);
+      // console.log(playerObjLocation.this);
       playerObjLocation.remoweCow(colorChoose, cowsamountChoose);
       cowsRemain[colorChoose] -= cowsamountChoose;
       activePlayer == 1
