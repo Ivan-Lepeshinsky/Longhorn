@@ -1,11 +1,18 @@
 "use strict";
 
 localStorage.clear();
+// ajax переменные
+let ajaxHandlerScript = "https://fe.it-academy.by/AjaxStringStorage2.php";
+let updatePassword;
+let stringName = "LEPESHINSKIY_LONGHORN_SCORES";
+let jsres; // результат таблицы
+restoreInfo();
+
 //блоки игры
 let wraperMain = document.getElementById("wraper_menu"); // блок-врапер главного меню
 let mainMenu = maimMenuCreate(); //блок главного меню
 let rulesBlock = rulesCreate(); // блок правил
-let scoresBlock = scoreCreate(); // блок очков
+let scoresBlock = scoreCreateinit(); // блок очков
 let gameZone; // визуальная часть игры на экране для SPA
 let gameState = 0; // состояние игры
 //0 - игра загружене
@@ -26,21 +33,16 @@ let playerMoves = 0; // количество шагов игрока
 let dragallow = 1; // было ли перетягивание коров
 // 0 - перетягивание состоялось и запрещено
 // 1 - перетягивание разрешено
+
 let dragState = 0; // состояние драгдропа
 // не начат
 // в процессе
+
 let cowsRemain = { black: 9, brown: 9, grey: 9, white: 9 };
 let zoneland; // зона посадки коров у игрока
 let colorChoose; // выбранный цвет коров для перетягивания
 let cowsamountChoose = 0; // число выбранных коров для определния числа ходов и записи в объект игрока
-
-// состояние игры в локальном хранилище
-// if (localStorage.getItem("gameState") == null) {
-// localStorage["gameState"] = gameState;
-// }
-//else if (localStorage.getItem("gameState") == 1) {
-//   document.getElementById("game_start").innerHTML = "Продолжить";
-// }
+let highScores; // таблица рекордов
 
 //класс для объектов поля и игроков, хранит информацию о цисле коров, методы добавления и удаления.
 class Storage {
@@ -167,15 +169,17 @@ function menumove(EO) {
     ) {
       rulesMove();
     }
+    if (
+      window.getComputedStyle(scoresBlock).getPropertyValue("top") == "50px"
+    ) {
+      scoresMove();
+    }
     if (gameZone != undefined) {
       wraperMain.removeChild(gameZone);
       document.body.style.background =
         "url(assets/background.jpg) no-repeat center";
       gameZone = undefined;
     }
-    setTimeout(mainMenuMove, 500);
-  } else if (EO == "scores_back") {
-    scoresMove();
     setTimeout(mainMenuMove, 500);
   }
 }
@@ -189,20 +193,21 @@ function rulesMove() {
   if (window.getComputedStyle(rulesBlock).getPropertyValue("top") == "2000px") {
     rulesBlock.style.top = "-50px";
     wraperMain.removeChild(mainMenu);
-  } else rulesBlock.style.top = "2000px";
+  } else {
+    rulesBlock.style.top = "2000px";
+  }
 }
 function scoresMove() {
   if (
-    scoresBlock.getAttribute("display") == "flex" ||
-    scoresBlock.getAttribute("display") == null
+    window.getComputedStyle(scoresBlock).getPropertyValue("top") == "2000px"
   ) {
-    scoresBlock.style.top = "100px";
-    scoresBlock.setAttribute("display", "block");
+    scoresBlock.style.top = "50px";
+    wraperMain.removeChild(mainMenu);
   } else {
     scoresBlock.style.top = "2000px";
-    scoresBlock.setAttribute("display", "flex");
   }
 }
+
 //созадем главный экран
 function maimMenuCreate() {
   let mainMenu = document.createElement("div");
@@ -220,8 +225,6 @@ function maimMenuCreate() {
   gameStart.id = "game_start";
   gameStart.innerHTML = "Новая игра";
   gameStart.addEventListener("click", switchToStartGame);
-  // нужно будет поправить функцию
-
   let rules = document.createElement("button");
   rules.classList.add("menu_button");
   rules.id = "rules";
@@ -248,54 +251,26 @@ function rulesCreate() {
   let p = `<p>Ход игры</p>
   <p>
     Жетон преступника показывает, чей сейчас ход. В свой ход преступник
-    должен: 1. Украсть быков 2. Передвинуть и перевернуть жетон
-    преступника
+    должен: 1. Украсть коров с участка где находиться 2. Передвинуться на соседний участок. 
+  </p>
+  <p> 1. Украсть коров в локации, где находится жетон преступника, онкрадёт всех коров одного (и только одного) цвета на свой выбор.            Фигурки украденных коров помещаются в область игрока, формируя стадо, стоимость которого определит победителя.
+  </p>     
+  <p> 2. Передвинуть жетон преступника в другую локацию на столько шагов,
+  сколько коров он только что украл. Передвигать жетон можно по            вертикали и по горизонтали, нельзя двигаться на шаг вперёд, а потом       сразу на шаг назад между двумя локациями. Когда ход окончен - жетон переворачивается и ход передаётся противнику.
+  </p>
+  <p>Конец игры</p>
+  <p> 1. Если игроку удаётся собрать 9 коров одного цвета (он немедленно
+  побеждает в игре). (Важно: если один игрок одновременно выполнил
+  условия 1 и 2, то действует условие 1 – он проигрывает.)
   </p>
   <p>
-            1. Украсть быков В локации, где находится жетон преступника, он
-            крадёт всех быков одного (и только одного) цвета на свой выбор.
-            Фигурки украденных быков игрок кладёт перед собой, формируя стадо,
-            стоимость которого он подсчитает в конце игры.
-          </p>
-          <p>
-            Если после кражи в локации не осталось ни одного быка, то к данному
-            игроку ОБЯЗАТЕЛЬНО применяется эффект жетона Действия,
-            расположенного в этой локации.
-          </p>
-          <p>Эффекты жетонов действия (функционал под вопросом)</p>
-          <p>
-            2. Передвинуть и перевернуть жетон преступника Игрок ДОЛЖЕН
-            передвинуть жетон преступника в другую локацию на столько шагов,
-            сколько быков он только что украл. Передвигать жетон можно по
-            вертикали и по горизонтали, нельзя двигаться на шаг вперёд, а потом
-            сразу на шаг назад между двумя локациями. Когда жетон передвинут, он
-            переворачивается: таким образом ход передаётся противнику.
-          </p>
-          <p>
-            Важно: если все локации, находящиеся на нужном расстоянии, уже
-            опустели, игра заканчивается и происходит подсчёт очков. Если на
-            нужном расстоянии осталась хотя бы одна локация с быками, игрок
-            должен передвинуть жетон в эту локацию (или одну из таких локаций).
-          </p>
-          <p>Конец игры Игра заканчивается в трёх случаях:</p>
-          <p>
-            1. Если один из преступников активирует жетон Шерифа (он немедленно
-            проигрывает).
-          </p>
-          <p>
-            2. Если игроку удаётся собрать 9 быков одного цвета (он немедленно
-            побеждает в игре). (Важно: если один игрок одновременно выполнил
-            условия 1 и 2, то действует условие 1 – он проигрывает.)
-          </p>
-          <p>
-            3. Если все локации, куда только что укравший быков игрок может
-            переместить жетон (локации на расстоянии, равном числу украденных им
-            быков), опустели. В таком случае игроки подсчитывают стоимость
-            своего стада и прибавляют стоимость полученных ими золотых слитков.
-            Побеждает тот, кто набрал больше победных очков! Стоимость стада: за
-            каждого быка в вашем стаде вы получаете $100, умноженных на
-            количество быков того же цвета, оставшихся на игровом поле.
-          </p>`;
+  2. Если жетон игрока оказывается в пустой локации. В таком случае игроки подсчитывают стоимость своего стада. Стоимость стада: за каждую корову в вашем стаде вы получаете $100, умноженных на количество коров того же цвета, оставшихся на игровом поле.
+  Побеждает тот, кто набрал больше победных очков! 
+  </p>
+  <p>Управление</p>
+  <p> 1. Украсть коров - перетянуть с поля коров</p>
+  <p> 2. Переместить преступника - стрелки клавиатуры или указатели направления вокруг фишки</p>
+  `;
   article.innerHTML = p;
   let button = document.createElement("button");
   button.classList.add("menu_button");
@@ -308,24 +283,50 @@ function rulesCreate() {
 }
 
 // создаем рекорды
+function scoreCreateinit() {
+  let scoreTable = document.createElement("div");
+  return scoreTable;
+}
 
 function scoreCreate() {
-  let s = document.createElement("div");
+  let scoreTable = document.createElement("div");
+  scoreTable.id = "scores_page";
+  let table = document.createElement("table");
+  let tbody = document.createElement("tbody");
+  let head = document.createElement("tr");
+  let number = document.createElement("td");
+  number.innerHTML = "№";
+  let player = document.createElement("td");
+  player.innerHTML = "Имя";
+  let score = document.createElement("td");
+  score.innerHTML = "очки";
+  head.appendChild(number);
+  head.appendChild(player);
+  head.appendChild(score);
+  tbody.appendChild(head);
+  for (let i = 1; i < highScores.length; i++) {
+    let line = document.createElement("tr");
+    number = document.createElement("td");
+    number.innerHTML = i;
+    player = document.createElement("td");
+    player.innerHTML = highScores[i].name;
+    score = document.createElement("td");
+    score.innerHTML = highScores[i].score;
+    line.appendChild(number);
+    line.appendChild(player);
+    line.appendChild(score);
+    tbody.appendChild(line);
+  }
 
-  //   <div id="scores_page">
-  //   <table>
-  //     <tr>
-  //       <td>игрок</td>
-  //       <td>1000</td>
-  //     </tr>
-  //     <tr>
-  //       <td>Игрок</td>
-  //       <td>900</td>
-  //     </tr>
-  //   </table>
-  //   <button class="menu_button" id="scores_back">Назад</button>
-  // </div>;
-  return s;
+  let button = document.createElement("button");
+  button.classList.add("menu_button");
+  button.id = "rules_back";
+  button.innerHTML = "Назад";
+  button.addEventListener("click", switchToMain);
+  table.appendChild(tbody);
+  scoreTable.appendChild(table);
+  scoreTable.appendChild(button);
+  scoresBlock = scoreTable;
 }
 
 // html верска игровой области
@@ -634,7 +635,7 @@ function playerLocation() {
 
 //drag&drop для коров с поля в область игрока
 function dragdrop(EO) {
-  if (dragallow == 0) {
+  if (dragallow == 0 || gameState == 2) {
     EO.preventDefault();
   } else if (EO.target.className == "land") {
     EO.preventDefault();
@@ -658,12 +659,16 @@ function dragdropend(EO) {
     let pl = EO.currentTarget.id.split("_");
     if (activePlayer == pl[1]) {
       zoneland.classList.remove("land_cows_landing");
+      console.log(playerObjLocation.this);
       playerObjLocation.remoweCow(colorChoose, cowsamountChoose);
       cowsRemain[colorChoose] -= cowsamountChoose;
       activePlayer == 1
         ? P1.addCow(colorChoose, cowsamountChoose)
         : P2.addCow(colorChoose, cowsamountChoose);
       updateCows();
+      if (cowsRemain[colorChoose] == 0) {
+        gameEnd(1, colorChoose);
+      }
       dragallow = 0;
       colorChoose = "";
       cowsamountChoose = 0;
@@ -674,13 +679,12 @@ function dragdropend(EO) {
 }
 
 // функции движения фишки
-
 document.addEventListener("keydown", keysMovemet);
 document.addEventListener("mousedown", mouseMovemet);
 
 //движение мышкой по стрелкам
 function mouseMovemet(EO) {
-  if (playerMoves != 0) {
+  if (playerMoves != 0 && gameState != 2) {
     if (EO.target.id == "AR3" && priviousMove != "up") {
       movement("up");
     }
@@ -697,7 +701,7 @@ function mouseMovemet(EO) {
 }
 // движение клавишами
 function keysMovemet(EO) {
-  if (playerMoves != 0) {
+  if (playerMoves != 0 && gameState != 2) {
     if (EO.code == "ArrowUp" && priviousMove != "up") {
       movement("up");
     }
@@ -720,7 +724,7 @@ function arrowVisible() {
   let down = document.getElementById("AR4");
 
   let arrows = document.getElementsByTagName("polygon");
-  playerMoves != 0 ? allvis("remove") : allvis("add");
+  playerMoves != 0 && gameState != 2 ? allvis("remove") : allvis("add");
   function allvis(e) {
     for (let i = 0; i < arrows.length; i++) {
       arrows[i].classList[e]("polygon");
@@ -799,26 +803,9 @@ function movement(dir) {
       `assets/P${activePlayer}.jpg`
     );
     if (playerObjLocation.cows.total == 0) {
-      gameEnd();
+      gameEnd(2);
     }
   }
-}
-
-function gameEnd() {
-  gameState = 2;
-  localStorage["gameState"] = gameState;
-  let P1score = score(P1);
-  let P2score = score(P2);
-  P1score > P2score
-    ? alert(`Игра окончена, победил игрок 1 со счетом ${P1score}`)
-    : alert(`Игра окончена, победил игрок 2 со счетом ${P2score}`);
-}
-function score(P) {
-  let score = 0;
-  for (let i = 0; i < cowsType.length; i++) {
-    score += cowsRemain[cowsType[i]] * P.cows[cowsType[i]];
-  }
-  return score * 100 + "$";
 }
 
 // аудио
@@ -841,7 +828,6 @@ function clickSound() {
 }
 
 // тач управление
-
 document.addEventListener("touchmove", touchMove);
 document.addEventListener("touchend", touchEnd);
 let el;
@@ -849,8 +835,6 @@ var touchShiftX = 0;
 var touchShiftY = 0;
 
 function touchStrat(EO) {
-  EO.preventDefault();
-  console.log(EO.target);
   el = EO.target.parentNode;
 
   let touchInfo = EO.targetTouches[0];
@@ -885,17 +869,15 @@ function touchMove(EO) {
   } else if (EO.target.className == "land") {
     EO.preventDefault();
   }
-  // EO.preventDefault();
+
   let touchInfo = EO.targetTouches[0];
   el.style.left = touchInfo.pageX - touchShiftX + "px";
   el.style.top = touchInfo.pageY - touchShiftY + "px";
 }
 
 function touchEnd(EO) {
-  if (dragState == 1) {
+  if (dragState == 1 || gameState == 2) {
     el.style.position = "relative";
-    // let pl = EO.currentTarget.id.split("_");
-    // if (activePlayer == pl[1]) {
     zoneland.classList.remove("land_cows_landing");
     playerObjLocation.remoweCow(colorChoose, cowsamountChoose);
     cowsRemain[colorChoose] -= cowsamountChoose;
@@ -903,11 +885,141 @@ function touchEnd(EO) {
       ? P1.addCow(colorChoose, cowsamountChoose)
       : P2.addCow(colorChoose, cowsamountChoose);
     updateCows();
+    if (cowsRemain[colorChoose] == 0) {
+      gameEnd(1);
+    }
     dragallow = 0;
     colorChoose = "";
     cowsamountChoose = 0;
     dragState = 0;
     arrowVisible();
-    // }
   }
+}
+
+//конец игры
+function gameEnd(X, color) {
+  let P1score = score(P1);
+  let P2score = score(P2);
+  if (X == 1) {
+    if (P1.cows[color] == 9) {
+      gameState = 2;
+      alert(
+        `Игра окончена, победил игрок 1 собрав 9 коров одного цвета и заработал ${P1score}`.highScoresCheck(
+          P1score
+        )
+      );
+    }
+    if (P2.cows[color] == 9) {
+      gameState = 2;
+      alert(
+        `Игра окончена, победил игрок 2 собрав 9 коров одного цвета и заработал ${P2score}`,
+        highScoresCheck(P2score)
+      );
+    }
+  }
+  if (X == 2) {
+    gameState = 2;
+    localStorage["gameState"] = gameState;
+    P1score > P2score
+      ? alert(
+          `Игра окончена, победил игрок 1 со счетом ${P1score}. Счет второго игрока ${P2score}`,
+          highScoresCheck(P1score)
+        )
+      : alert(
+          `Игра окончена, победил игрок 2 со счетом ${P2score}. Счет второго игрока ${P1score}`,
+          highScoresCheck(P2score)
+        );
+  }
+}
+
+function score(P) {
+  let score = 0;
+  for (let i = 0; i < cowsType.length; i++) {
+    score += cowsRemain[cowsType[i]] * P.cows[cowsType[i]];
+  }
+  return score * 100 + "$";
+}
+
+function highScoresCheck(score) {
+  for (let i = 1; i < highScores.length; i++) {
+    if (score > highScores[i].score) {
+      let player = prompt("Введите ваше имя для таблицы рекордов");
+      highScores.splice(i, 0, {});
+      highScores[i].name = player;
+      highScores[i].score = score;
+      highScores.length = 11;
+      break;
+    }
+  }
+  storeInfo();
+}
+
+// Ajax функции
+function restoreInfo() {
+  $.ajax({
+    url: ajaxHandlerScript,
+    type: "POST",
+    cache: false,
+    dataType: "json",
+    data: { f: "READ", n: stringName },
+    success: dataLoaded,
+    error: errorHandler,
+  });
+}
+
+// function insertInfo() {
+//   $.ajax({
+//     url: ajaxHandlerScript,
+//     type: "POST",
+//     cache: false,
+//     dataType: "json",
+//     data: { f: "INSERT", n: stringName, v: tbsc },
+//     success: dataLoaded,
+//     error: errorHandler,
+//   });
+// }
+
+function storeInfo() {
+  updatePassword = Math.random();
+  $.ajax({
+    url: ajaxHandlerScript,
+    type: "POST",
+    cache: false,
+    dataType: "json",
+    data: { f: "LOCKGET", n: stringName, p: updatePassword },
+    success: lockGetReady,
+    error: errorHandler,
+  });
+}
+
+function lockGetReady() {
+  $.ajax({
+    url: ajaxHandlerScript,
+    type: "POST",
+    cache: false,
+    dataType: "json",
+    data: {
+      f: "UPDATE",
+      n: stringName,
+      v: JSON.stringify(highScores),
+      p: updatePassword,
+    },
+    success: updateReady,
+    error: errorHandler,
+  });
+}
+function updateReady() {
+  scoreCreate();
+  switchToScore();
+}
+
+function dataLoaded(data) {
+  jsres = data.result;
+  highScores = [];
+  highScores = JSON.parse(jsres);
+  scoreCreate();
+}
+
+function errorHandler(jqXHR, statusStr, errorStr) {
+  alert(statusStr + " " + errorStr);
 }

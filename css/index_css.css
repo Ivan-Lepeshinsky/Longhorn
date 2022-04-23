@@ -79,6 +79,25 @@ p {
   color: white;
 }
 
+tr > td:first-child {
+  width: 50px;
+}
+tr > td:nth-child(2) {
+  width: 150px;
+}
+
+tr > td:last-child {
+  width: 100px;
+}
+
+td {
+  border: 1px solid black;
+  height: 40px;
+  font-size: 24px;
+  text-align: center;
+  color: white;
+}
+
 /* css игровой области */
 
 #gameZone {
@@ -185,6 +204,10 @@ svg {
     padding: 5px;
     font-size: 14px;
   }
+
+  article {
+    width: 1000px;
+  }
   #field {
     width: 1000px;
     height: 800px;
@@ -244,6 +267,13 @@ svg {
     padding: 5px;
     font-size: 14px;
   }
+  article {
+    width: 900px;
+  }
+  p {
+    font-size: 14px;
+  }
+
   #field {
     width: 800px;
     height: 600px;
