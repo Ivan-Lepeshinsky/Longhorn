@@ -920,15 +920,23 @@ function gameEnd(X, color) {
   if (X == 2) {
     gameState = 2;
     localStorage["gameState"] = gameState;
-    P1score > P2score
-      ? alert(
-          `Игра окончена, победил игрок 1 со счетом ${P1score}. Счет второго игрока ${P2score}`,
-          highScoresCheck(P1score)
-        )
-      : alert(
-          `Игра окончена, победил игрок 2 со счетом ${P2score}. Счет второго игрока ${P1score}`,
-          highScoresCheck(P2score)
-        );
+    if (P1score > P2score) {
+      alert(
+        `Игра окончена, победил игрок 1 со счетом ${P1score}. Счет второго игрока ${P2score}`,
+        highScoresCheck(P1score)
+      );
+    }
+    if (P1score < P2score) {
+      alert(
+        `Игра окончена, победил игрок 2 со счетом ${P2score}. Счет второго игрока ${P1score}`,
+        highScoresCheck(P2score)
+      );
+    }
+    if (P1score == P2score) {
+      alert(
+        `Игра окончена ничьйё. Счет игрока 1 ${P1score}. Счет игрока ${P2score}`
+      );
+    }
   }
 }
 
