@@ -10,7 +10,7 @@ html {
 body {
   background: url(../assets/background.jpg) no-repeat center;
   height: 1000px;
-  overflow: hidden;
+  overflow: auto;
   transition-duration: 3s;
   transform: translateZ(0);
 }
@@ -182,7 +182,7 @@ svg {
 @media only screen and (max-width: 1600px) {
   body {
     width: 1600px;
-    height: 800px;
+    height: fit-content;
   }
   .wraper {
     width: 1200px;
@@ -246,7 +246,7 @@ svg {
 @media only screen and (max-width: 1300px) {
   body {
     width: 1200px;
-    height: 600px;
+    height: fit-content;
   }
   .wraper {
     width: 1000px;
